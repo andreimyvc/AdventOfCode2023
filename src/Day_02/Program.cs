@@ -26,6 +26,7 @@ namespace Day_02
                     Id = int.Parse(item[0].Replace("Game ", ""))
                 };
 
+                bool success = true;
                 foreach (var sub in item[1].Split(';'))
                 {
                     var cubos = sub
@@ -38,25 +39,15 @@ namespace Day_02
                     game.Green = cubos.Where(p => p.color == "green").Sum(p => p.amount);
                     game.Blue = cubos.Where(p => p.color == "blue").Sum(p => p.amount);
 
-                    if (!(game.Red > 12 || game.Green >= 13 || game.Blue >= 14))
+                    if (game.Red > 12 || game.Green > 13 || game.Blue > 14)
                     {
-                        gameList.Add(game);
-
-                        break;
+                        success =  false;
                     }
+                }
 
-                    //if (
-                    //    (game.Red == 12 && game.Green <= 13 && game.Blue <= 14)
-                    //    ||
-                    //    (game.Green == 13 && game.Red <= 12 && game.Blue <= 14)
-                    //    ||
-                    //    (game.Blue == 14 && game.Red <= 12 && game.Green <= 13)
-                    //    )
-                    //{
-                    //    gameList.Add(game);
-
-                    //    break;
-                    //}
+                if(success)
+                {
+                    gameList.Add(game);
                 }
 
             }
