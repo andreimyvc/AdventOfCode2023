@@ -5,7 +5,7 @@ namespace Day_02
     {
         static void Main(string[] args)
         {
-            string[] data = File.ReadAllLines("day02.1.txt");
+            string[] data = File.ReadAllLines("input.txt");
             var gameList = Parse(data);
             int? sum = gameList.Sum(p => p.Id);
 

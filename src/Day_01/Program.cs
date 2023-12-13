@@ -28,7 +28,7 @@ namespace Day_01
         };
         static void Main(string[] args)
         {
-            string[] data = File.ReadAllLines("day01.2.txt");
+            string[] data = File.ReadAllLines("input.txt");
             int? sum = Calibrate2(data);
 
             Console.WriteLine($"Calibration : {sum}");
