@@ -1,4 +1,7 @@
-﻿namespace Day_03
+﻿using System;
+using System.Runtime.CompilerServices;
+
+namespace Day_03
 {
     internal class Program
     {
@@ -8,113 +11,134 @@
             Console.WriteLine($"{Sum(data)}");
         }
 
+       
         static int Sum(string[] lines)
         {
-            int sum = 0, posStart = 0, posEnd;
+            int sum = 0, posStart = 0, posEnd, down = 0;
 
             string previousLine = string.Empty;
-            string currentLine = string.Empty;
+            string currentLine = lines[down];
             string nextLine = string.Empty;
-            char tempChar;
+            string temp = string.Empty;
 
-            for (int top = 0; top < lines.Length; top++) 
+            char previousChar = ' ', nextChar = ' ', tempChar;
+
+            for (int right = 0; right < currentLine.Length; right++)
             {
-                currentLine = lines[top];
+                var c = currentLine[right];
 
-                string temp = "";
-
-                for (int left = 0; left < currentLine.Length; left++)
+                if (c.IsDigit())
                 {
-                    var c = currentLine[left];
+                    temp = $"{temp}{c}";
 
-                    if (char.IsDigit(c))
+                    if (temp.Length == 1)
                     {
-                        temp = $"{temp}{c}";
+                        if (right - 1 >= 0)
+                        {
+                            posStart = right - 1;
+                        }
+                        else
+                        {
+                            posStart = right;
+                        }
+                        previousChar = currentLine[posStart];
                     }
+
+                    if (right + 1 < currentLine.Length)
+                    {
+                        posEnd = right + 1;
+                    }
+                    else
+                    {
+                        posEnd = right;
+                    }
+
+                    nextChar = currentLine[posEnd];
+
+                    if (!nextChar.IsDigit() || posEnd + 1 >= currentLine.Length)
+                    {
+                        if (previousChar.IsSymbol())
+                        {
+                            Console.WriteLine(temp);
+                            sum += int.Parse(temp);
+                            temp = "";
+                        }
+                        else if (nextChar.IsSymbol())
+                        {
+                            Console.WriteLine(temp);
+                            sum += int.Parse(temp);
+                            temp = "";
+                        }
+
+                        if (temp.Length > 0 && down > 0)
+                        {
+                            previousLine = lines[down - 1];
+
+                            if (previousLine.Substring(posStart, 1 + posEnd - posStart).Any(p => p.IsSymbol()))
+                            {
+                                Console.WriteLine(temp);
+                                sum += int.Parse(temp);
+                                temp = "";
+                            }
+                        }
+
+                        if (temp.Length > 0 && down + 1 < lines.Length)
+                        {
+                            nextLine = lines[down + 1];
+
+                            if (nextLine.Substring(posStart, 1 + posEnd - posStart).Any(p => p.IsSymbol()))
+                            {
+                                Console.WriteLine(temp);
+                                sum += int.Parse(temp);
+                                temp = "";
+                            }
+                        }
+
+                        if (!nextChar.IsDigit() || posEnd == currentLine.Length)
+                        {
+                            temp = "";
+                        }
+                    }
+
                     
-                    if(temp.Length > 0 && (left >= currentLine.Length - 1 || !char.IsDigit(currentLine[left + 1])))
-                    {
-                        //LEFT
-                        if (left < currentLine.Length - 1)
-                        {
-                            if (left - 1 >= 0)
-                            {
-                                tempChar = currentLine[left - 1];
-
-                                if (tempChar != '.' && !char.IsDigit(tempChar))
-                                {
-                                    sum += int.Parse(temp);
-                                    Console.WriteLine(temp);
-                                    temp = string.Empty;
-                                    continue;
-                                }
-                            }                            
-                        }
-
-                        //RIGHT
-                        if (left - temp.Length - 1 >= 0)
-                        {
-                            if (left + 1 < currentLine.Length)
-                            {
-                                tempChar = currentLine[left + 1];
-
-                                if (tempChar != '.' && !char.IsDigit(tempChar))
-                                {
-                                    sum += int.Parse(temp);
-                                    Console.WriteLine(temp);
-                                    temp = string.Empty;
-                                    continue;
-                                }
-                            }                            
-                        }
-
-                        //UP
-                        if (top > 0)
-                        {
-                            posStart = left - temp.Length - 1;
-                            posEnd = left;
-
-                            posStart = posStart >= 0 ? posStart : 0;
-                            posEnd = posEnd < previousLine.Length ? posEnd : posEnd - 1;
-
-                            if (previousLine.Substring(posStart, 1 + posEnd - posStart).Any(p => !char.IsDigit(p) && p != '.'))
-                            {
-                                sum += int.Parse(temp);
-                                Console.WriteLine(temp);
-                                temp = string.Empty;
-                                continue;
-                            }
-                        }
-
-                        //DOWN
-                        if (top < lines.Length - 1)
-                        {
-                            nextLine = lines[top + 1];
-
-                            posStart = left - temp.Length - 1;
-                            posEnd = left;
-
-                            posStart = posStart >= 0 ? posStart : 0;
-                            posEnd = posEnd < nextLine.Length ? posEnd : posEnd - 1;
-
-                            if (nextLine.Substring(posStart, 1 + posEnd - posStart).Any(p => !char.IsDigit(p) && p != '.'))
-                            {
-                                sum += int.Parse(temp);
-                                Console.WriteLine(temp);
-                                temp = string.Empty;
-                                continue;
-                            }
-
-                        }
-
-                        temp = string.Empty;
-                    }
                 }
 
-                previousLine = currentLine;
+                if (right + 1 == currentLine.Length)
+                {
+                    right = -1;
+                    down++;
+                    temp = "";
+
+                    if (down == lines.Length)
+                    {
+                        return sum;
+                    }
+                    
+                    currentLine = lines[down];
+
+                }
             }
 
             return sum;
+        }
+    }
+
+    public static class ExtensionMethods
+    {
+        public static bool IsSymbol(this char c)
+        {
+            if (c == null || c == ' ')
+                return false;
+
+            return !char.IsDigit(c)  &&  c != '.';
+        }
+
+        public static bool IsDigit(this char c)
+        {
+            if (c == null || c == ' ')
+                return false;
+
+            return char.IsDigit(c);
         }
     }
 }
